@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="note-page-title">Cargando Noticia...</title>
+    <!-- Incluye Tailwind CSS para un estilo rápido y responsive -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Define la fuente Inter para todo el documento */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Estilos para el carrusel de imágenes */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px; /* Ancho máximo para el carrusel */
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .carousel-slide {
+            display: flex;
+            transition: transform 0.5s ease-in-out;
+        }
+        .carousel-slide img {
+            width: 100%;
+            flex-shrink: 0;
+            object-fit: cover;
+            height: 400px; /* Altura fija para las imágenes del carrusel */
+            border-radius: 0.5rem; /* rounded-lg */
+        }
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 9999px; /* full rounded */
+            cursor: pointer;
+            z-index: 10;
+            font-size: 1.5rem;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease;
+        }
+        .carousel-button:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+        .carousel-button.prev {
+            left: 1rem;
+        }
+        .carousel-button.next {
+            right: 1rem;
+        }
+        /* Estilos para el spinner de carga */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #3b82f6; /* Tailwind blue-500 */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        /* Estilos para el encabezado con imagen de fondo */
+        .header-bg {
+            background-image: url('http://googleusercontent.com/file_content/5'); /* Default image */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            overflow: hidden;
+            height: 400px; /* Altura fija para el encabezado */
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+        .header-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4); /* Capa oscura semitransparente */
+            z-index: 1;
+        }
+        .header-top {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem;
+        }
+        .header-center-title {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            flex-grow: 1; /* Permite que el título central ocupe espacio */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding-bottom: 2rem; /* Espacio para el subtítulo */
+        }
+        .header-bottom-text {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            text-align: center;
+            padding-bottom: 1.5rem;
+            font-size: 1.125rem; /* text-lg */
+            font-weight: 500; /* medium */
+        }
+        .header-logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .header-logo {
+            height: 2.5rem; /* h-10 */
+            width: 2.5rem; /* w-10 */
+            border-radius: 9999px; /* rounded-full */
+            object-fit: cover;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #3b82f6; /* Tailwind blue-500 */
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 0.5rem;
+            top: 100%; /* Posiciona debajo del elemento padre */
+            left: 0;
+            padding: 0.5rem 0;
+        }
+        .dropdown-content a {
+            color: white;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+        }
+        .dropdown-content a:hover {
+            background-color: #2563eb; /* Tailwind blue-600 */
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800 antialiased">
+    <!-- Contenedor principal -->
+    <div class="container mx-auto px-4 py-8 md:px-6 lg:px-8 max-w-4xl bg-white shadow-lg rounded-xl my-8">
+
+        <!-- Sección de Encabezado -->
+        <header class="mb-12 rounded-lg shadow-md header-bg" id="main-header">
+            <div class="header-overlay"></div>
+            <div class="header-top">
+                <div class="header-logo-container">
+                    <img src="http://googleusercontent.com/file_content/3" alt="Logo Sala 6" class="header-logo" id="header-logo-display">
+                    <!-- <span class="text-2xl font-bold">Sala 6</span> ELIMINADO -->
+                </div>
+                <nav>
+                    <ul class="flex space-x-6 text-lg">
+                        <li class="relative dropdown">
+                            <a href="index.html" class="hover:text-blue-400 transition-colors duration-200 flex items-center">
+                                Inicio
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            </a>
+                            <div class="dropdown-content">
+                                <a href="archive.html">Archivo de Noticias</a>
+                                <a href="upload.html">Subir Nota</a>
+                            </div>
+                        </li>
+                        <li><a href="about.html" class="hover:text-blue-400 transition-colors duration-200">Acerca de Nosotros</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <div class="header-center-title">
+                <h1 class="text-6xl md:text-7xl font-extrabold">Sala 6</h1>
+            </div>
+            <div class="header-bottom-text">
+                <p>EL MEJOR LUGAR PARA TUS NOTICIAS DE CINE.</p>
+            </div>
+        </header>
+
+        <!-- Contenido de la Noticia -->
+        <main id="note-content-area" class="space-y-8">
+            <div id="loading-spinner" class="flex justify-center items-center py-10">
+                <div class="spinner"></div>
+                <p class="ml-3 text-gray-600">Cargando noticia...</p>
+            </div>
+            <!-- El contenido de la noticia se cargará aquí -->
+        </main>
+
+        <!-- Sección de Pie de Página -->
+        <footer class="mt-12 pt-6 bg-gray-200 text-gray-800 text-sm rounded-xl py-8 px-6 flex flex-col md:flex-row justify-between items-start space-y-8 md:space-y-0 md:space-x-8">
+            <!-- Left Section: Logo and Title -->
+            <div class="flex flex-col items-center md:items-start md:w-1/4">
+                <h2 class="text-4xl font-extrabold mb-4">SALA 6</h2>
+                <img src="http://googleusercontent.com/file_content/3" alt="Logo SALA 6" class="h-24 mb-4 rounded-lg shadow-md" id="footer-logo-display">
+            </div>
+
+            <!-- Middle Section: Explore and Follow Us -->
+            <div class="flex flex-col md:flex-row md:w-1/2 justify-around space-y-8 md:space-y-0 md:space-x-8">
+                <div class="flex flex-col items-center md:items-start">
+                    <h3 class="font-bold text-lg mb-4">Explora</h3>
+                    <ul class="space-y-2 text-center md:text-left">
+                        <li><a href="about.html" class="hover:underline">Acerca de nosotros</a></li>
+                        <li><a href="#" class="hover:underline">Contacto</a></li>
+                    </ul>
+                </div>
+                <div class="flex flex-col items-center md:items-start">
+                    <h3 class="font-bold text-lg mb-4">Síguenos</h3>
+                    <ul class="space-y-2 text-center md:text-left">
+                        <li><a href="https://x.com/Sala_6_" target="_blank" class="hover:underline">X (Twitter)</a></li>
+                        <!-- Add other social media links as needed -->
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Section: Newsletter Signup -->
+            <div class="flex flex-col items-center md:items-end md:w-1/4 text-center md:text-right">
+                <p class="mb-4">Regístrate con tu dirección de correo electrónico para recibir noticias y actualizaciones.</p>
+                <div class="flex flex-col space-y-2 w-full max-w-sm">
+                    <input type="email" id="newsletter-email-note" placeholder="Correo electrónico"
+                           class="flex-grow px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-gray-900">
+                    <button id="newsletter-signup-button-note" class="bg-gray-800 hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-md shadow-lg transition duration-300 ease-in-out">
+                        REGISTRARSE
+                    </button>
+                </div>
+                <p id="newsletter-message-note" class="text-sm mt-2 hidden"></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Variables globales para Firebase
+        let app;
+        let db;
+        let auth;
+        let userId;
+
+        // Configuración de Firebase - ¡IMPORTANTE! Las variables __app_id, __firebase_config, __initial_auth_token
+        // son proporcionadas por el entorno de Canvas.
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? initialAuthToken : null;
+
+        // Función para inicializar Firebase y autenticar al usuario
+        async function initializeFirebase() {
+            try {
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Autenticar al usuario
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                // Obtener el userId después de la autenticación
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        console.log("Usuario autenticado:", userId);
+                        loadNoteDetails(); // Cargar detalles de la nota una vez que el usuario esté autenticado
+                        loadSiteSettings(); // Load site settings
+                    } else {
+                        console.log("No hay usuario autenticado. Usando ID anónimo si es necesario.");
+                        userId = crypto.randomUUID(); // Generar un ID anónimo si no hay autenticación
+                        loadNoteDetails(); // Cargar detalles de la nota incluso si es anónimo
+                        loadSiteSettings(); // Load site settings
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error al inicializar Firebase o autenticar:", error);
+                document.getElementById('note-content-area').innerHTML = `<p class="text-red-500 text-center">Error al cargar la noticia. Por favor, inténtalo de nuevo más tarde.</p>`;
+            }
+        }
+
+        // Function to load site settings (header background, logos)
+        function loadSiteSettings() {
+            if (!db) {
+                console.warn("Firestore not ready to load site settings.");
+                return;
+            }
+            const siteSettingsDocRef = doc(db, `artifacts/${appId}/public/data/site_settings/global`);
+
+            onSnapshot(siteSettingsDocRef, (docSnap) => {
+                const mainHeader = document.getElementById('main-header');
+                const headerLogoDisplay = document.getElementById('header-logo-display');
+                const footerLogoDisplay = document.getElementById('footer-logo-display');
+
+                if (docSnap.exists()) {
+                    const settings = docSnap.data();
+                    if (settings.headerBgUrl && mainHeader) {
+                        mainHeader.style.backgroundImage = `url('${settings.headerBgUrl}')`;
+                    }
+                    if (settings.headerLogoUrl && headerLogoDisplay) {
+                        headerLogoDisplay.src = settings.headerLogoUrl;
+                    }
+                    if (settings.footerLogoUrl && footerLogoDisplay) {
+                        footerLogoDisplay.src = settings.footerLogoUrl;
+                    }
+                } else {
+                    console.log("No site settings found. Using default images.");
+                    // Fallback to default images if no settings are found
+                    if (mainHeader) mainHeader.style.backgroundImage = `url('http://googleusercontent.com/file_content/5')`;
+                    if (headerLogoDisplay) headerLogoDisplay.src = 'http://googleusercontent.com/file_content/3';
+                    if (footerLogoDisplay) footerLogoDisplay.src = 'http://googleusercontent.com/file_content/3';
+                }
+            }, (error) => {
+                console.error("Error loading site settings:", error);
+            });
+        }
+
+        // Función para cargar los detalles de la nota
+        async function loadNoteDetails() {
+            if (!db || !userId) {
+                console.warn("Firestore o userId no están listos. Reintentando en 1 segundo...");
+                setTimeout(loadNoteDetails, 1000);
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const noteId = urlParams.get('id');
+            const noteContentArea = document.getElementById('note-content-area');
+            const loadingSpinner = document.getElementById('loading-spinner');
+
+            if (loadingSpinner) {
+                loadingSpinner.style.display = 'none'; // Ocultar spinner
+            }
+
+            if (!noteId) {
+                noteContentArea.innerHTML = `<p class="text-red-500 text-center text-xl">Error: ID de noticia no encontrado.</p>`;
+                document.getElementById('note-page-title').textContent = "Noticia No Encontrada";
+                return;
+            }
+
+            try {
+                const docRef = doc(db, `artifacts/${appId}/public/data/news`, noteId);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const note = docSnap.data();
+                    document.getElementById('note-page-title').textContent = note.title;
+
+                    let mediaContent = '';
+                    // Carrusel de imágenes
+                    if (note.imageUrls && note.imageUrls.length > 0) {
+                        const imagesHtml = note.imageUrls.map(url => `<img src="${url}" alt="Imagen de la noticia" class="rounded-lg shadow-md">`).join('');
+                        mediaContent += `
+                            <div class="carousel-container">
+                                <div class="carousel-slide" id="carousel-slide">
+                                    ${imagesHtml}
+                                </div>
+                                <button class="carousel-button prev" onclick="moveSlide(-1)">&#10094;</button>
+                                <button class="carousel-button next" onclick="moveSlide(1)">&#10095;</button>
+                            </div>
+                        `;
+                        // Inicializar carrusel
+                        window.currentSlide = 0;
+                        window.moveSlide = (direction) => {
+                            const slides = document.getElementById('carousel-slide').children;
+                            window.currentSlide = (window.currentSlide + direction + slides.length) % slides.length;
+                            document.getElementById('carousel-slide').style.transform = `translateX(-${window.currentSlide * 100}%)`;
+                        };
+                    }
+                    // Video de YouTube
+                    if (note.youtubeUrl) {
+                        const youtubeIdMatch = note.youtubeUrl.match(/(?:https?:\/\/)?(?:www\.)?(?:m\.)?(?:youtube\.com|youtu\.be)\/(?:watch\?v=|embed\/|v\/|)([\w-]{11})(?:\S+)?/);
+                        if (youtubeIdMatch && youtubeIdMatch[1]) {
+                            mediaContent += `
+                                <div class="relative" style="padding-bottom: 56.25%;">
+                                    <iframe class="absolute top-0 left-0 w-full h-full rounded-lg shadow-md"
+                                            src="https://www.youtube.com/embed/${youtubeIdMatch[1]}"
+                                            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                            allowfullscreen></iframe>
+                                </div>
+                            `;
+                        }
+                    }
+
+                    noteContentArea.innerHTML = `
+                        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6 text-center">${note.title}</h1>
+                        <p class="text-gray-500 text-sm text-center mb-8">Publicado el: ${new Date(note.createdAt.toDate()).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                        <div class="prose prose-lg max-w-none text-gray-700 leading-relaxed mb-10">
+                            <p>${note.content.replace(/\n/g, '<br>')}</p>
+                        </div>
+                        ${mediaContent ? `<section class="mt-10 p-6 bg-gray-50 rounded-lg shadow-sm">${mediaContent}</section>` : ''}
+                    `;
+                } else {
+                    noteContentArea.innerHTML = `<p class="text-red-500 text-center text-xl">Noticia no encontrada.</p>`;
+                    document.getElementById('note-page-title').textContent = "Noticia No Encontrada";
+                }
+            } catch (error) {
+                console.error("Error al cargar la noticia:", error);
+                noteContentArea.innerHTML = `<p class="text-red-500 text-center text-xl">Hubo un error al cargar la noticia. Por favor, inténtalo de nuevo.</p>`;
+            }
+        }
+
+        // Script para el formulario de suscripción del pie de página
+        document.getElementById('newsletter-signup-button-note').addEventListener('click', () => {
+            const emailInput = document.getElementById('newsletter-email-note');
+            const email = emailInput.value;
+            const messageElement = document.getElementById('newsletter-message-note');
+
+            if (email && email.includes('@') && email.includes('.')) {
+                messageElement.textContent = '¡Gracias por registrarte!';
+                messageElement.classList.remove('hidden', 'text-red-500');
+                messageElement.classList.add('text-green-600');
+                emailInput.value = ''; // Limpiar el input
+                console.log('Suscripción al boletín:', email);
+            } else {
+                messageElement.textContent = 'Por favor, introduce un correo electrónico válido.';
+                messageElement.classList.remove('hidden', 'text-green-600');
+                messageElement.classList.add('text-red-500');
+            }
+        });
+
+        // Inicializar Firebase cuando la ventana cargue
+        window.onload = initializeFirebase;
+    </script>
+</body>
+</html>
+
